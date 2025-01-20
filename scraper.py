@@ -2,6 +2,8 @@ import multiprocessing
 import requests
 from bs4 import BeautifulSoup
 import json
+import time
+
 
 # to get all articles
 def get_articles():
@@ -73,29 +75,44 @@ if __name__ == '__main__':
     multiprocessing.freeze_support()
     multiprocessing.set_start_method('spawn')
     q = multiprocessing.SimpleQueue()
-    
+    print('Getting articles...')
+    start_time = time.time()
     articles = get_articles()
+    end_time = time.time()
+    time_elasped = end_time - start_time
+    print(f'took {time_elasped:.2f} seconds')
     while(True):
         keyword = (input('Enter your keyword: ')).lower() 
+        start_time = time.time()
         results_before_desc = scrape(articles)
-
+        end_time = time.time()
+        time_elasped = end_time - start_time
+        print(f'took {time_elasped:.2f} seconds')
+        start_time = time.time()
         #starting processes
         c = multiprocessing.Process(target=consumer, args=(q,results_before_desc,))
         c.start()     
         for i in range(len(results_before_desc)):
             p = multiprocessing.Process(target=get_desc, args=(results_before_desc,i,q,))
             p.start()  
-        p.join()        
-        c.join(1.0)
+        for i in range(len(results_before_desc)): 
+            p.join()        
+        c.join(0.0)
         
         #output
+        end_time = time.time()
         results = q.get()
+        
         print(f'{len(results)} articles found')
+        time_elasped = end_time - start_time
+        print(f'took {time_elasped:.2f} seconds')
         
         if len(results) == 0:
             print('There are no results that match your search')
-            
+           
         retry = input('Press Enter to try again or input q to quit ')
         if retry == 'q':
             c.close()
+            p.close()
             quit()
+        q.close()
