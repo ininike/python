@@ -92,7 +92,8 @@ selector_dict = {
 }
 
 results =  arisenews.scrape(selector_dict,'miners') 
-print(str(results)) 
+if results != None:
+    print(str(results)) 
 
 
 
