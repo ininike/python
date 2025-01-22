@@ -5,9 +5,8 @@ import json
 
 
 class Scraper:
-    def __init__(self, home_url, file_name ):
+    def __init__(self, home_url):
         self.home_url = home_url
-        self.file_name = file_name
     
     def _get_string(self, soup, selector, type):
         if type == 'text':
@@ -45,6 +44,7 @@ class Scraper:
                 'desc': self._get_string(soup,selector_dict['desc'],'text')
             }
             data_json = json.dumps(data)
+            print(data_json)
             queue.put(data_json)
         else:
             queue.put(f"Failed to retrieve the website({link}). Status code: {response.status_code}") 
@@ -72,15 +72,15 @@ class Scraper:
                 p.start() 
             for i in range(len(links)): 
                 p.join()        
-            c.join(1.0); c.close() ; p.close()
+            c.join(1.0)
             
             results = queue.get()
-            with open(self.file_name,'a') as f:
-                f.write(str(results))
+            if len(results) == 0:
+                results = ['There are no results that match your search']
             return results
         
 
-arisenews = Scraper('https://www.arise.tv/', 'scrape.txt')     
+arisenews = Scraper('https://www.arise.tv/')     
 
 selector_dict = {
     'title': 'h1',
@@ -91,6 +91,18 @@ selector_dict = {
     'desc': 'header p p'
 }
 
-results =  arisenews.scrape(selector_dict,'tiktok') 
-if results != None:
-    print(str(results)) 
+results =  arisenews.scrape(selector_dict,'miners') 
+print(str(results)) 
+
+
+
+        
+    
+        
+        
+        
+    
+    
+        
+        
+    
