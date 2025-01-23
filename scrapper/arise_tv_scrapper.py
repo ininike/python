@@ -32,6 +32,9 @@ class AriseTVScraper:
         links = []
         for article in articles:
             if keyword.lower() in article.text.lower():
+                #------------------------------------------------------------
+                #This is where you change the home page article link selector
+                #------------------------------------------------------------
                 link = await self._get_string(article, '.img-link', 'link')
                 links.append(link)
         return links
