@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import json
 
 
-class TVCTVScraper:
+class AriseTVScraper:
     def __init__(self):
         pass
     
@@ -23,16 +23,17 @@ class TVCTVScraper:
         except aiohttp.ClientConnectorError as e:
             print('Connection Error', str(e))
             return ''
+            
 
     async def _get_articles_links(self, session, keyword):
-        url = "https://www.tvcnews.tv/"
+        url = "https://www.arise.tv/"
         content = await self._fetch(session, url)
         soup = BeautifulSoup(content, 'html.parser')
         articles = soup.find_all('article')
         links = []
         for article in articles:
             if keyword.lower() in article.text.lower():
-                link = await self._get_string(article, '.jeg_post_title a', 'link')
+                link = await self._get_string(article, '.img-link', 'link')
                 links.append(link)
         return links
 
@@ -43,11 +44,12 @@ class TVCTVScraper:
             #--------------------------------------
             #This is where you change the selectors
             #--------------------------------------
-            'title': await self._get_string(soup, '.jeg_post_title', 'text'),
+            'title': await self._get_string(soup, 'h1', 'text'),
             'img_link': await self._get_string(soup, '.wp-post-image', 'img'),
             'page_link': link,
-            'date': await self._get_string(soup, '.jeg_meta_date', 'text'),
-            'desc': await self._get_string(soup, 'strong', 'text')
+            'date': await self._get_string(soup, '.date', 'text'),
+            'posted_by': await self._get_string(soup, 'a[rel = "author"]', 'text'),
+            'desc': await self._get_string(soup, 'header p p', 'text')
         }
         return json.dumps(data)
 
@@ -65,7 +67,7 @@ class TVCTVScraper:
 
 
 async def main():
-    results = await TVCTVScraper().scrape()
+    results = await AriseTVScraper().scrape()
     if results:
         print(results)
 

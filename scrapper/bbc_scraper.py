@@ -4,17 +4,20 @@ from bs4 import BeautifulSoup
 import json
 
 
-class TVCTVScraper:
+class BBCTVScraper:
     def __init__(self):
         pass
     
     async def _get_string(self, soup, selector, type):
         if type == 'text':
-            return ((soup.select(selector))[0]).text
+            string = soup.select(selector)
+            return (string[0]).text if len(string) > 0 else None
         if type == 'link':
-            return ((soup.select(selector))[0]).get('href')
+            string = soup.select(selector)
+            return (string[0]).get('href') if len(string) > 0 else None
         if type == 'img':
-            return ((soup.select(selector))[0]).get('src')
+            string = soup.select(selector)
+            return (string[0]).get('src') if len(string) > 0 else None
 
     async def _fetch(self, session, url):
         try:
@@ -23,16 +26,18 @@ class TVCTVScraper:
         except aiohttp.ClientConnectorError as e:
             print('Connection Error', str(e))
             return ''
+            
 
     async def _get_articles_links(self, session, keyword):
-        url = "https://www.tvcnews.tv/"
+        url = "https://www.bbc.com"
         content = await self._fetch(session, url)
         soup = BeautifulSoup(content, 'html.parser')
-        articles = soup.find_all('article')
+        articles = soup.select('.sc-c6f6255e-0')
         links = []
         for article in articles:
             if keyword.lower() in article.text.lower():
-                link = await self._get_string(article, '.jeg_post_title a', 'link')
+                link = url + await self._get_string(article, '.gILusN', 'link')
+                print(link)
                 links.append(link)
         return links
 
@@ -43,11 +48,12 @@ class TVCTVScraper:
             #--------------------------------------
             #This is where you change the selectors
             #--------------------------------------
-            'title': await self._get_string(soup, '.jeg_post_title', 'text'),
-            'img_link': await self._get_string(soup, '.wp-post-image', 'img'),
+            'title': await self._get_string(soup, 'h1', 'text'),
+            'img_link': await self._get_string(soup, '.efFcac', 'img'),
             'page_link': link,
-            'date': await self._get_string(soup, '.jeg_meta_date', 'text'),
-            'desc': await self._get_string(soup, 'strong', 'text')
+            'date': await self._get_string(soup, '.bGezbH', 'text'),
+            'posted_by': await self._get_string(soup, '.khDNZq', 'text'),
+            'desc': await self._get_string(soup, '.fYAfXe:nth-of-type(1)', 'text')
         }
         return json.dumps(data)
 
@@ -65,7 +71,7 @@ class TVCTVScraper:
 
 
 async def main():
-    results = await TVCTVScraper().scrape()
+    results = await BBCTVScraper().scrape()
     if results:
         print(results)
 
