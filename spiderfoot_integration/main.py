@@ -12,6 +12,12 @@ def search_by_name(input: Input):
     results = run_command(command)
     return results
 
+@app.post("/aiprompt",status_code=200,description='prompt ai')
+async def prompt_ai(input: Prompt):
+    response = await prompt_deepseek(input.prompt + ' ')
+    return response
+
+
 
     
     
