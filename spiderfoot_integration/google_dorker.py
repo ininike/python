@@ -103,7 +103,7 @@ class GoogleDorkScrapper:
             soup = BeautifulSoup(html, 'html.parser')
             documents_from_page = [
                 {
-                    "site_url": section.select_one("h3").text.strip(),         
+                    "document_name": section.select_one("h3").text.strip(),         
                     "site_name": section.select_one(".VuuXrf").text.strip(), 
                     "document_link": section.select_one("a").get("href"),
                     "preview": section.select_one(".VwiC3b.yXK7lf.p4wth.r025kc.hJNv6b.Hdw6tb").text.strip(),
