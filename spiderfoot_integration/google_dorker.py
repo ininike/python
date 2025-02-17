@@ -77,7 +77,7 @@ class GoogleDorkScrapper:
             time.sleep(2)
             recaptcha_iframe = self.driver.find_element(By.XPATH, '//iframe[@title="reCAPTCHA"]')
             self.solver.click_recaptcha_v2(iframe=recaptcha_iframe)
-            time.sleep(5) 
+            time.sleep(2) 
             return self.driver.page_source
         except Exception as e:
             print(f"Error: {e}")
@@ -88,7 +88,7 @@ class GoogleDorkScrapper:
         start = page_number * 10
         try:
             self.driver.get(f"{current_url}&start={start}")
-            time.sleep(5)
+            time.sleep(2)
             return self.driver.page_source
         except Exception as e:
             print(f"Error: {e}")
@@ -103,7 +103,7 @@ class GoogleDorkScrapper:
             soup = BeautifulSoup(html, 'html.parser')
             documents_from_page = [
                 {
-                    "document_name": section.select_one("h3").text.strip(),         
+                    "site_url": section.select_one("h3").text.strip(),         
                     "site_name": section.select_one(".VuuXrf").text.strip(), 
                     "document_link": section.select_one("a").get("href"),
                     "preview": section.select_one(".VwiC3b.yXK7lf.p4wth.r025kc.hJNv6b.Hdw6tb").text.strip(),
@@ -118,4 +118,3 @@ gds = GoogleDorkScrapper()
 results = asyncio.run(gds.search(search_string="inioluwa ayotomiwa adenaike",number_of_pages=2))
 if results:
     print(results)
-
